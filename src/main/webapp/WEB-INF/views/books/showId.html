@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Human</title>
+</head>
+<body>
+<p th:text="${book.getName()} + ',' +${book.getAuthor()} + ',' + ${book.getYearEditions()}"></p>
+
+<form th:if="${personBusy != null}" th:action="@{/books/sendFreeBook/{id}(id=${book.getId()})}" th:method="POST">
+    <p th:text="${msgWhereBook} + ${personBusy.getName()} + ' ' + ${personBusy.getSurname()} +' ' +
+    ${personBusy.getPatronymic()}"></p>
+
+    <input type="submit" value="Free Book" >
+</form>
+
+<form th:if="${personBusy == null}" th:action="@{/books/sendBusyBook/{id}(id=${book.getId()})}"
+      th:method="POST" id="person">
+    <p th:text="${msgWhereBook}"></p>
+    <label for="select">Select person -></label>
+        <select th:object="${person}" th:field="*{id}" id="select">
+            <option th:each="person : ${people}" th:value="${person.getId()}" th:text="${person.getName} + ' ' +
+                 ${person.getSurname} + ' ' + ${person.getPatronymic()}">
+
+            </option>
+        </select>
+    <input type="submit" value="Assign book">
+</form>
+
+<p><a th:href="@{/books/{id}/edit(id=${book.getId()})}">Edit</a></p>
+<p><a th:href="@{/books/{id}/delete(id=${book.getId()})}">Delete</a></p>
+</body>
+</html>

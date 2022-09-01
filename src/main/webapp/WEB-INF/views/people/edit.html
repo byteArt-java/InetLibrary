@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Person</title>
+</head>
+<body>
+<form th:method="POST" th:action="@{/people/editPerson/{id}(id=${person.getId()})}" th:object="${person}">
+    <label for="name">Enter name:</label>
+    <input type="text" th:field="*{name}" id="name" maxlength="50"/>
+    <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+    <br/>
+    <label for="surname">Enter surname:</label>
+    <input type="text" th:field="*{surname}" id="surname" maxlength="50"/>
+    <div style="color:red" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></div>
+    <br/>
+    <label for="patronymic">Enter patronymic:</label>
+    <input type="text" th:field="*{patronymic}" id="patronymic" maxlength="50"/>
+    <div style="color:red" th:if="${#fields.hasErrors('patronymic')}" th:errors="*{patronymic}"></div>
+    <br/>
+    <label for="date">Enter birthday:</label>
+    <input type="date" th:field="*{birthday}" id="date"/>
+    <div style="color:red" th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></div>
+    <br/>
+    <input type="submit" value="Update Person">
+</form>
+</body>
+</html>

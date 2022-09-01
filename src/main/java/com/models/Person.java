@@ -1,30 +1,27 @@
 package com.models;
 
 
-import org.hibernate.validator.constraints.UniqueElements;
-
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class Person {
     private int id;
-    @NotNull(message = "Name should not be empty")
+    @NotEmpty(message = "Name should not be empty")
     private String name;
-    @NotNull(message = "Surname should not be empty")
+    @NotEmpty(message = "Surname should not be empty")
     private String surname;
-    @NotNull(message = "Patronymic should not be empty")
+    @NotEmpty(message = "Patronymic should not be empty")
     private String patronymic;
-    @Pattern(regexp = "1{1}[9]{1}[7-9]{1}[0-9]{1}|2{1}0{1}[0-2]{1}[0-9]{1}",message = "invalid yearOfBirth")
-    private LocalDate yearOfBirth;
+    @Pattern(regexp = "((1{1}[9]{1}[7-9]{1}[1-9]{1})[\\-]([0]{1}[1-9]{1}|[1]{1}[1-2]{1})[\\-]([1]{1}[1-2]{1}|[0-3]{1}[1-9]{1}))|((2{1}[0]{1}[0-2]{1}[1-9]{1})[\\-]([0]{1}[1-9]{1}|[1]{1}[1-2]{1})[\\-]([1]{1}[1-2]{1}|[0-3]{1}[1-9]{1}))",message = "Date is not valid")
+    private String birthday;
 
-    public Person(int id,String name,String surname,String patronymic,LocalDate yearOfBirth) {
+    public Person(int id,String name,String surname,String patronymic,String yearOfBirth) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.patronymic = patronymic;
-        this.yearOfBirth = yearOfBirth;
+        this.birthday = yearOfBirth;
     }
 
     public Person(){
@@ -63,11 +60,15 @@ public class Person {
         this.patronymic = patronymic;
     }
 
-    public LocalDate getYearOfBirth() {
-        return yearOfBirth;
+    public String getBirthday() {
+        return birthday;
     }
 
-    public void setYearOfBirth(LocalDate yearOfBirth) {
-        this.yearOfBirth = yearOfBirth;
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    @Override public String toString() {
+        return "Person{" + "id=" + id + ", name='" + name + '\'' + ", surname='" + surname + '\'' + ", patronymic='" + patronymic + '\'' + ", birthday=" + birthday + '}';
     }
 }
