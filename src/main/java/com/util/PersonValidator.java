@@ -2,6 +2,7 @@ package com.util;
 
 import com.dao.PersonDao;
 import com.models.Person;
+import com.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -9,11 +10,11 @@ import org.springframework.validation.Validator;
 
 @Component
 public class PersonValidator implements Validator {
-    private final PersonDao personDao;
+    private final PersonService personService;
 
     @Autowired
-    public PersonValidator(PersonDao personDao) {
-        this.personDao = personDao;
+    public PersonValidator(PersonService personService) {
+        this.personService = personService;
     }
 
     @Override public boolean supports(Class<?> clazz) {
@@ -22,7 +23,7 @@ public class PersonValidator implements Validator {
 
     @Override public void validate(Object target, Errors errors) {
         Person person = (Person) target;
-        if (personDao.findDuplicate(person).isPresent()){
+        if (personService.findDuplicate(person) != null){
             System.out.println("Ошибка ввода данных");
             errors.rejectValue("name","","Name is already exists");
             errors.rejectValue("surname","","Surname is already exists");

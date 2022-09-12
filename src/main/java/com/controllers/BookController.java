@@ -1,10 +1,9 @@
 package com.controllers;
 
-import com.dao.BookDao;
-import com.dao.PersonBooksDao;
-import com.dao.PersonDao;
 import com.models.Book;
 import com.models.Person;
+import com.service.BookService;
+import com.service.PersonService;
 import com.util.BookValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,33 +16,32 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/books")
 public class BookController {
-    private final BookDao bookDao;
     private final BookValidator bookValidator;
-    private final PersonBooksDao personBooksDao;
-    private final PersonDao personDao;
+    private final BookService bookService;
+    private final PersonService personService;
 
     @Autowired
-    public BookController(BookDao bookDao, BookValidator bookValidator, PersonBooksDao personBooksDao, PersonDao personDao) {
-        this.bookDao = bookDao;
+    public BookController(BookValidator bookValidator, BookService bookService, PersonService personService) {
+        this.bookService = bookService;
         this.bookValidator = bookValidator;
-        this.personBooksDao = personBooksDao;
-        this.personDao = personDao;
+        this.personService = personService;
     }
 
     @GetMapping
     public String showAllBooks(Model model){
-        model.addAttribute("allBooks",bookDao.showAllBooks());
+        model.addAttribute("allBooks",bookService.showAllBooks());
         return "books/allBooks";
     }
 
     @GetMapping("/{id}")
-    public String showId(Model model,@PathVariable("id") int id,@ModelAttribute("person") Person person){
-        model.addAttribute("book",bookDao.findById(id));
-        Person personFromDB = personBooksDao.getBooksForBusyPerson(id);
-        model.addAttribute("personBusy",personFromDB);
-        model.addAttribute("msgWhereBook",personFromDB != null ? "The book is now at: " :
+    public String showId(Model model, @PathVariable("id") int id, @ModelAttribute("person") Person person){
+        Book bookId = bookService.findById(id);
+        model.addAttribute("book",bookId);
+        Person owner = bookId.getOwner();
+        model.addAttribute("personBusy",owner);
+        model.addAttribute("msgWhereBook",owner != null ? "The book is now at: " :
                 "Book is free. Who should I assign it to?");
-        model.addAttribute("people",personDao.showAllPeople());
+        model.addAttribute("people",personService.showAllPeople());
         return "books/showId";
     }
 
@@ -58,42 +56,58 @@ public class BookController {
         if (br.hasErrors()){
             return "books/add";
         }
-        bookDao.createNewBook(book);
+        bookService.createNewBook(book);
         return "redirect:/books";
     }
 
     @GetMapping("/{id}/edit")
     public String editPage(Model model,@PathVariable("id") int id){
-        model.addAttribute("book",bookDao.findById(id));
+        model.addAttribute("book",bookService.findById(id));
         return "books/edit";
     }
 
     @PostMapping("editBook/{id}")
     public String editBook(@ModelAttribute("book") @Valid Book book, BindingResult br,
-                             @PathVariable("id") int id){
+                           @PathVariable("id") int id){
         bookValidator.validate(book,br);
         if (br.hasErrors()){
             return "books/edit";
         }
-        bookDao.update(book,id);
+        bookService.update(book,id);
         return "redirect:/books";
     }
 
     @GetMapping("/{id}/delete")
     public String deleteBook(@PathVariable("id") int id){
-        bookDao.deleteBook(id);
+        bookService.deleteBook(id);
         return "redirect:/books";
     }
 
     @PostMapping("/sendBusyBook/{id}")
     public String sendBusyBook(@ModelAttribute("person") Person person,@PathVariable("id") int id){
-        personBooksDao.busyBookById(id,person.getId());
+        bookService.busyBookById(id,person);
         return "redirect:/books/" + id;
     }
 
     @PostMapping("/sendFreeBook/{id}")
     public String sendFreeBook(@PathVariable("id") int id){
-        personBooksDao.freeBookById(id);
+        bookService.freeBookById(id);
         return "redirect:/books/" + id;
+    }
+
+    @GetMapping("/searchBook")
+    public String searchPage(Model model){
+        model.addAttribute("book",new Book());
+        return "books/searchBook";
+    }
+
+    @PostMapping("/searchBookByName")
+    public String searchBook(@RequestParam("name") String name){
+        Book byName = bookService.findByName(name);
+        if (byName == null){
+            return "redirect:/books";
+        }else {
+            return "redirect:/books/" + byName.getId();
+        }
     }
 }

@@ -1,10 +1,11 @@
 package com.controllers;
 
-import com.dao.PersonBooksDao;
-import com.dao.PersonDao;
 import com.models.Book;
 import com.models.Person;
+import com.service.BookService;
+import com.service.PersonService;
 import com.util.PersonValidator;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,34 +13,47 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @org.springframework.stereotype.Controller
 @RequestMapping("/people")
 public class PeopleController {
-    private final PersonDao personDao;
+    private final PersonService personService;
     private final PersonValidator personValidator;
-    private final PersonBooksDao personBooksDao;
+    private final BookService bookService;
 
     @Autowired
-    public PeopleController(PersonDao personDao, PersonValidator personValidator, PersonBooksDao personBooksDao) {
-        this.personDao = personDao;
+    public PeopleController(PersonService personService, PersonValidator personValidator, BookService bookService) {
+        this.personService = personService;
         this.personValidator = personValidator;
-        this.personBooksDao = personBooksDao;
+        this.bookService = bookService;
     }
 
     @GetMapping
     public String showAll(Model model){
-        model.addAttribute("allPeople",personDao.showAllPeople());
+        model.addAttribute("allPeople",personService.showAllPeople());
         return "people/allPeople";
     }
 
     @GetMapping("/{id}")
     public String showId(@PathVariable("id") int id,Model model){
-        model.addAttribute("person",personDao.findById(id));
-        List<Book> listBooks = personBooksDao.getBooksForPerson(id);
-        model.addAttribute("books",listBooks);
-        model.addAttribute("booksTitle",!listBooks.isEmpty() ? "Books:" :
+        Person byId = personService.findById(id);
+        model.addAttribute("person",byId);
+        List<Book> books = byId.getBooks();
+        Date currentDate = new Date();
+        StringBuilder sb = new StringBuilder();
+        currentDate.setTime(currentDate.getTime() + BookService.PERIOD_USED);
+        for (int i = 0; i < books.size() - 1; i++) {
+            if (books.get(i).getDate_issued() != null && books.get(i).getDate_issued().before(currentDate) && sb.length() < 1){
+                sb.append("Expired book is name: ").append(books.get(i).getName()).append(". ");
+            }else if (books.get(i).getDate_issued() != null && books.get(i).getDate_issued().before(currentDate)){
+                sb.append(books.get(i).getName()).append(". ");
+            }
+        }
+        model.addAttribute("books",books);
+        model.addAttribute("expired",sb.toString());
+        model.addAttribute("booksTitle",!byId.getBooks().isEmpty() ? "Books:" :
                 "The person did not take a single book");
         return "people/showId";
     }
@@ -55,13 +69,13 @@ public class PeopleController {
         if (br.hasErrors()){
             return "people/add";
         }
-        personDao.createNewPerson(person);
+        personService.createNewPerson(person);
         return "redirect:/people";
     }
 
     @GetMapping("/{id}/edit")
     public String editPage(Model model,@PathVariable("id") int id){
-        model.addAttribute("person",personDao.findById(id));
+        model.addAttribute("person",personService.findById(id));
         return "people/edit";
     }
 
@@ -72,13 +86,19 @@ public class PeopleController {
         if (br.hasErrors()){
             return "people/edit";
         }
-        personDao.update(person,id);
+        personService.update(person,id);
         return "redirect:/people";
     }
 
     @GetMapping("/{id}/delete")
     public String deletePerson(@PathVariable("id") int id){
-        personDao.deletePerson(id);
+        Person person = personService.findById(id);
+        List<Book> books = person.getBooks();
+        for (Book book : books) {
+            book.setOwner(null);
+            bookService.save(book);
+        }
+        personService.deletePerson(person.getId());
         return "redirect:/people";
     }
 }

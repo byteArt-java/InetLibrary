@@ -16,6 +16,8 @@ ${person.getSurname()} + ' ' + ${person.getPatronymic()} + ', ' + ${person.getBi
     ${book.getYearEditions().toString()}"></p>
 </div>
 
+<p th:text="${expired}"></p>
+
 <hr/>
 <form th:method="GET" th:action="@{/people/{id}/edit(id=${person.getId()})}">
     <input type="submit" value="Edit">
