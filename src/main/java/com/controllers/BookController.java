@@ -2,8 +2,8 @@ package com.controllers;
 
 import com.models.Book;
 import com.models.Person;
-import com.service.BookService;
-import com.service.PersonService;
+import com.services.BookService;
+import com.services.PersonService;
 import com.util.BookValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -2,10 +2,9 @@ package com.util;
 
 import com.dao.BookDao;
 import com.models.Book;
-import com.service.BookService;
+import com.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
