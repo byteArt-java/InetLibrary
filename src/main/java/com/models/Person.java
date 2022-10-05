@@ -1,17 +1,16 @@
 package com.models;
 
 
-import org.hibernate.annotations.Cascade;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
+@Data
 @Entity
 @Table(name = "person")
 public class Person {
@@ -36,69 +35,38 @@ public class Person {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "birthday")
-    private Date birthday;
+    private LocalDate birthday;
 
+    @Column(name = "email")
+    @NotEmpty(message = "Email should not be empty")
+    @Email(message = "Email incorrect")
+    private String email;
+
+    @Column(name = "password")
+    @NotEmpty(message = "Password should not be empty")
+    private String password;
+
+    @Column(name = "role")
+    @NotEmpty(message = "Password should not be empty")
+    private String role;
     @OneToMany(mappedBy = "owner",fetch = FetchType.EAGER)
     private List<Book> books;
 
-    public Person(int id,String name,String surname,String patronymic,Date yearOfBirth) {
+    public Person(int id, String name, String surname, String patronymic, LocalDate birthday,
+                  String email, String password, String role, List<Book> books) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.patronymic = patronymic;
-        this.birthday = yearOfBirth;
+        this.birthday = birthday;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.books = books;
     }
 
     public Person(){
 
-    }
-
-    public List<Book> getBooks() {
-        return books;
-    }
-
-    public void setBooks(List<Book> books) {
-        this.books = books;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getPatronymic() {
-        return patronymic;
-    }
-
-    public void setPatronymic(String patronymic) {
-        this.patronymic = patronymic;
-    }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
     }
 
     @Override
@@ -109,23 +77,10 @@ public class Person {
                 ", surname='" + surname + '\'' +
                 ", patronymic='" + patronymic + '\'' +
                 ", birthday=" + birthday +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                ", books=" + books +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return id == person.id &&
-                Objects.equals(name, person.name) &&
-                Objects.equals(surname, person.surname) &&
-                Objects.equals(patronymic, person.patronymic) &&
-                Objects.equals(birthday, person.birthday);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, surname, patronymic, birthday);
     }
 }

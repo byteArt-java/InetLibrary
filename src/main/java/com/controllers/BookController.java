@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/books")
+@RequestMapping("/booksForReader")
 public class BookController {
     private final BookValidator bookValidator;
     private final BookService bookService;
     private final PersonService personService;
+    private static final String pathTemplate = "booksForReader";
 
     @Autowired
     public BookController(BookValidator bookValidator, BookService bookService, PersonService personService) {
@@ -30,7 +31,7 @@ public class BookController {
     @GetMapping
     public String showAllBooks(Model model){
         model.addAttribute("allBooks",bookService.showAllBooks());
-        return "books/allBooks";
+        return pathTemplate + "/allBooks";
     }
 
     @GetMapping("/{id}")
@@ -42,28 +43,28 @@ public class BookController {
         model.addAttribute("msgWhereBook",owner != null ? "The book is now at: " :
                 "Book is free. Who should I assign it to?");
         model.addAttribute("people",personService.showAllPeople());
-        return "books/showId";
+        return pathTemplate + "/showId";
     }
 
     @GetMapping("/add")
     public String addBook(@ModelAttribute("book") Book book){
-        return "books/add";
+        return pathTemplate + "/add";
     }
 
     @PostMapping
     public String addBook(@ModelAttribute("book") @Valid Book book, BindingResult br){
         bookValidator.validate(book,br);
         if (br.hasErrors()){
-            return "books/add";
+            return pathTemplate + "/add";
         }
         bookService.createNewBook(book);
-        return "redirect:/books";
+        return "redirect:/" + pathTemplate;
     }
 
     @GetMapping("/{id}/edit")
     public String editPage(Model model,@PathVariable("id") int id){
         model.addAttribute("book",bookService.findById(id));
-        return "books/edit";
+        return pathTemplate + "/edit";
     }
 
     @PostMapping("editBook/{id}")
@@ -71,43 +72,43 @@ public class BookController {
                            @PathVariable("id") int id){
         bookValidator.validate(book,br);
         if (br.hasErrors()){
-            return "books/edit";
+            return pathTemplate + "/edit";
         }
         bookService.update(book,id);
-        return "redirect:/books";
+        return "redirect:/" + pathTemplate;
     }
 
     @GetMapping("/{id}/delete")
     public String deleteBook(@PathVariable("id") int id){
         bookService.deleteBook(id);
-        return "redirect:/books";
+        return "redirect:/" + pathTemplate;
     }
 
     @PostMapping("/sendBusyBook/{id}")
-    public String sendBusyBook(@ModelAttribute("person") Person person,@PathVariable("id") int id){
-        bookService.busyBookById(id,person);
-        return "redirect:/books/" + id;
+    public String sendBusyBook(@ModelAttribute("person") Person person, @PathVariable("id") int id){
+        bookService.busyBookById(id, person);
+        return "redirect:/" + pathTemplate + "/" + id;
     }
 
     @PostMapping("/sendFreeBook/{id}")
     public String sendFreeBook(@PathVariable("id") int id){
         bookService.freeBookById(id);
-        return "redirect:/books/" + id;
+        return "redirect:/" + pathTemplate + "/" + id;
     }
 
     @GetMapping("/searchBook")
     public String searchPage(Model model){
         model.addAttribute("book",new Book());
-        return "books/searchBook";
+        return pathTemplate + "/searchBook";
     }
 
     @PostMapping("/searchBookByName")
     public String searchBook(@RequestParam("name") String name){
         Book byName = bookService.findByName(name);
         if (byName == null){
-            return "redirect:/books";
+            return "redirect:/" + pathTemplate;
         }else {
-            return "redirect:/books/" + byName.getId();
+            return "redirect:/" + pathTemplate + "/" + byName.getId();
         }
     }
 }

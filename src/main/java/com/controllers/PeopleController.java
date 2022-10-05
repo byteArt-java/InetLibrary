@@ -20,6 +20,7 @@ public class PeopleController {
     private final PersonService personService;
     private final PersonValidator personValidator;
     private final BookService bookService;
+    private static final String pathTemplate = "readers";
 
     @Autowired
     public PeopleController(PersonService personService, PersonValidator personValidator, BookService bookService) {
@@ -31,7 +32,7 @@ public class PeopleController {
     @GetMapping
     public String showAll(Model model){
         model.addAttribute("allPeople",personService.showAllPeople());
-        return "people/allPeople";
+        return pathTemplate + "/allPeople";
     }
 
     @GetMapping("/{id}")
@@ -53,39 +54,39 @@ public class PeopleController {
         model.addAttribute("expired",sb.toString());
         model.addAttribute("booksTitle",!byId.getBooks().isEmpty() ? "Books:" :
                 "The person did not take a single book");
-        return "people/showId";
+        return pathTemplate + "/showId";
     }
 
     @GetMapping("/add")
     public String addPerson(@ModelAttribute("person") Person person){
-        return "people/add";
+        return pathTemplate + "/add";
     }
 
     @PostMapping
     public String addPerson(@ModelAttribute("person") @Valid Person person, BindingResult br){
         personValidator.validate(person,br);
         if (br.hasErrors()){
-            return "people/add";
+            return pathTemplate + "/add";
         }
         personService.createNewPerson(person);
-        return "redirect:/people";
+        return "redirect:/" + pathTemplate;
     }
 
     @GetMapping("/{id}/edit")
     public String editPage(Model model,@PathVariable("id") int id){
         model.addAttribute("person",personService.findById(id));
-        return "people/edit";
+        return pathTemplate + "/edit";
     }
 
     @PostMapping("editPerson/{id}")
-    public String editPerson(@ModelAttribute("person") @Valid Person person,BindingResult br,
+    public String editPerson(@ModelAttribute("person") @Valid Person person, BindingResult br,
                              @PathVariable("id") int id){
         personValidator.validate(person,br);
         if (br.hasErrors()){
-            return "people/edit";
+            return pathTemplate + "/edit";
         }
         personService.update(person,id);
-        return "redirect:/people";
+        return "redirect:/" + pathTemplate;
     }
 
     @GetMapping("/{id}/delete")
@@ -97,6 +98,6 @@ public class PeopleController {
             bookService.save(book);
         }
         personService.deletePerson(person.getId());
-        return "redirect:/people";
+        return "redirect:/" + pathTemplate;
     }
 }
