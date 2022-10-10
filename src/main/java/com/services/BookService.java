@@ -65,7 +65,7 @@ public class BookService {
     @Transactional
     public void busyBookById(int idBook, Person person) {
         Book book = bookRepository.findById(idBook).orElse(null);
-        book.setOwner(person);
+        book.setPerson_id(person);
 //        book.setDate_issued(new Date());
         bookRepository.save(book);
     }
@@ -73,7 +73,7 @@ public class BookService {
     @Transactional
     public void freeBookById(int idBook) {
         Book book = bookRepository.findById(idBook).orElse(null);
-        book.setOwner(null);
+        book.setPerson_id(null);
 //        book.setDate_issued(null);
         bookRepository.save(book);
     }

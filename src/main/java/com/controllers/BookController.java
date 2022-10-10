@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/booksForReader")
+@RequestMapping("/books")
 public class BookController {
     private final BookValidator bookValidator;
     private final BookService bookService;
@@ -38,7 +38,7 @@ public class BookController {
     public String showId(Model model, @PathVariable("id") int id, @ModelAttribute("person") Person person){
         Book bookId = bookService.findById(id);
         model.addAttribute("book",bookId);
-        Person owner = bookId.getOwner();
+        Person owner = bookId.getPerson_id();
         model.addAttribute("personBusy",owner);
         model.addAttribute("msgWhereBook",owner != null ? "The book is now at: " :
                 "Book is free. Who should I assign it to?");

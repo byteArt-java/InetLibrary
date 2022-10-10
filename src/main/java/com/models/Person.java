@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -19,6 +20,10 @@ public class Person {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "username")
+    @NotEmpty(message = "Username should not be empty")
+    private String username;
 
     @Column(name = "name")
     @NotEmpty(message = "Name should not be empty")
@@ -35,7 +40,7 @@ public class Person {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "birthday")
-    private LocalDate birthday;
+    private Date birthday;
 
     @Column(name = "email")
     @NotEmpty(message = "Email should not be empty")
@@ -49,12 +54,18 @@ public class Person {
     @Column(name = "role")
     @NotEmpty(message = "Password should not be empty")
     private String role;
-    @OneToMany(mappedBy = "owner",fetch = FetchType.EAGER)
+
+    @Column(name = "banned")
+    @NotEmpty(message = "Banned should not be empty")
+    private Boolean banned;
+
+    @OneToMany(mappedBy = "person_id",fetch = FetchType.EAGER)
     private List<Book> books;
 
-    public Person(int id, String name, String surname, String patronymic, LocalDate birthday,
-                  String email, String password, String role, List<Book> books) {
+    public Person(int id, String username, String name, String surname, String patronymic,
+                  Date birthday, String email, String password, String role, Boolean banned) {
         this.id = id;
+        this.username = username;
         this.name = name;
         this.surname = surname;
         this.patronymic = patronymic;
@@ -62,7 +73,7 @@ public class Person {
         this.email = email;
         this.password = password;
         this.role = role;
-        this.books = books;
+        this.banned = banned;
     }
 
     public Person(){
@@ -73,6 +84,7 @@ public class Person {
     public String toString() {
         return "Person{" +
                 "id=" + id +
+                ", username='" + username + '\'' +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", patronymic='" + patronymic + '\'' +
@@ -80,7 +92,7 @@ public class Person {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
-                ", books=" + books +
+                ", banned=" + banned +
                 '}';
     }
 }

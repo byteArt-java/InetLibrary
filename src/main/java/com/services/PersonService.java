@@ -34,7 +34,7 @@ public class PersonService {
 
     public Person findDuplicate(Person person){
         return personRepository.findByNameAndSurnameAndPatronymic(person.getName(),
-                person.getSurname(), person.getPatronymic());
+                person.getSurname(), person.getPatronymic()).orElse(null);
     }
 
     @Transactional
