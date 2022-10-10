@@ -29,7 +29,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan("com")
 @EnableWebMvc
-@EnableJpaRepositories("com.repositories")
+//@EnableJpaRepositories("com.repositories")
 @EnableTransactionManagement
 @PropertySource("classpath:hibernate.properties")
 public class SpringConfig implements WebMvcConfigurer {
