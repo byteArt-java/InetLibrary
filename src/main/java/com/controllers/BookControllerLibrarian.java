@@ -6,23 +6,27 @@ import com.services.BookService;
 import com.services.PersonService;
 import com.util.BookValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.Collection;
 
 @Controller
 @RequestMapping("/books")
-public class BookController {
+public class BookControllerLibrarian {
     private final BookValidator bookValidator;
     private final BookService bookService;
     private final PersonService personService;
     private static final String pathTemplate = "booksForReader";
 
     @Autowired
-    public BookController(BookValidator bookValidator, BookService bookService, PersonService personService) {
+    public BookControllerLibrarian(BookValidator bookValidator, BookService bookService, PersonService personService) {
         this.bookService = bookService;
         this.bookValidator = bookValidator;
         this.personService = personService;
@@ -31,6 +35,16 @@ public class BookController {
     @GetMapping
     public String showAllBooks(Model model){
         model.addAttribute("allBooks",bookService.showAllBooks());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getDetails());
+        return pathTemplate + "/allBooks";
+    }
+
+    @GetMapping("/books")
+    public String showAll(Model model){
+        model.addAttribute("allBooks",bookService.showAllBooks());
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println(Arrays.toString(new Collection[]{authentication.getAuthorities()}));
         return pathTemplate + "/allBooks";
     }
 

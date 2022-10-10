@@ -1,5 +1,7 @@
 package com.models;
 
 public enum Role {
-    READER,LIBRARIAN,ADMIN;
+    READER,
+    LIBRARIAN,
+    ADMIN;
 }
