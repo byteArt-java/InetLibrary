@@ -12,7 +12,7 @@ public class BookValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return false;
+        return true;
     }
 
     @Override
