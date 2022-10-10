@@ -1,0 +1,20 @@
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class UserServiceUnitTest {
+
+    @Autowired
+    private UserService userService;
+
+    @Test
+    public void recordCreation() {
+        List<User> users = userService.list();
+        Assert.assertEquals(users.size(), 3);
+    }
+
+    @Test
+    public void testUserFindByEmail() {
+        // First user test
+        User user = userService.loadUserByEmail("mail@mail.com");
+        Assert.assertEquals(user.getName(), "User1");
+    }
+}
